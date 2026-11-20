@@ -1,0 +1,18 @@
+# 构建产物，随时能重新生成
+build/
+Debug/
+Release/
+
+# CMake 自动生成的
+compile_commands.json
+
+# CubeMX 缓存
+.mxproject
+
+# 编译中间件
+*.o
+*.d
+*.elf
+*.map
+*.bin
+*.hex
