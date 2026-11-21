@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "led.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,7 +87,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-Led_Init();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -97,8 +97,8 @@ Led_Init();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  Led_Toggle();
-HAL_Delay(500);}
+  
+}
   /* USER CODE END 3 */
 }
 
