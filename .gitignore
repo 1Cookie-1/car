@@ -1,5 +1,6 @@
 # 构建产物，随时能重新生成
 build/
+build*/
 Debug/
 Release/
 
