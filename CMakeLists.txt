@@ -34,6 +34,14 @@ enable_language(C ASM)
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 
+# === User code begin (do not remove) ===
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/project_sources.cmake)
+if(USER_SOURCES)
+    target_sources(car PRIVATE ${USER_SOURCES})
+endif()
+target_include_directories(car PRIVATE ${USER_INCLUDES})
+# === User code end ===
+
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
