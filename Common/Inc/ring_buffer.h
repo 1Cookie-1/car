@@ -14,8 +14,9 @@
  *
  * 约定：
  *   - head == tail 表示缓冲区为空；
- *   - 始终保留一个空位用于区分空/满，最大可用容量为 size - 1；
- *   - size 不要求是 2 的幂，任意 size >= 2 均可；
+ *   - 始终保留一个空位用于区分空/满，有效容量 = size - 1，最小 size 为 2；
+ *   - size 不要求是 2 的幂；size < 2 时初始化为无效缓冲区；
+ *   - 无效缓冲区 Put/Get 返回 false，Count 返回 0，IsEmpty 为 true，IsFull 为 false；
  *   - 不使用动态内存，存储空间由调用者提供。
  */
 typedef struct {

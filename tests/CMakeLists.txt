@@ -36,6 +36,20 @@ add_executable(test_scheduler
 )
 target_include_directories(test_scheduler PRIVATE ../Application/scheduler)
 
+add_executable(test_ring_buffer_invalid_size
+    common/test_ring_buffer_invalid_size.c
+    ../Common/Src/ring_buffer.c
+)
+target_include_directories(test_ring_buffer_invalid_size PRIVATE ../Common/Inc)
+
+add_executable(test_pid_invalid_dt
+    modules/test_pid_invalid_dt.c
+    ../Modules/pid/pid.c
+)
+target_include_directories(test_pid_invalid_dt PRIVATE ../Modules/pid)
+
+add_test(NAME pid_invalid_dt COMMAND test_pid_invalid_dt)
+add_test(NAME ring_buffer_invalid_size COMMAND test_ring_buffer_invalid_size)
 add_test(NAME ring_buffer COMMAND test_ring_buffer)
 add_test(NAME crc8 COMMAND test_crc8)
 add_test(NAME mecanum COMMAND test_mecanum)

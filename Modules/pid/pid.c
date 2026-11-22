@@ -38,7 +38,7 @@ float Pid_Update(Pid *pid, float setpoint, float measurement, float dt)
     float d_term = 0.0f;
 
     if (dt <= 0.0f) {
-        dt = 0.001f; /* 防止除零 */
+        return 0.0f;
     }
 
     pid->integral += pid->ki * error * dt;

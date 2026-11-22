@@ -3,14 +3,19 @@
 void RingBuffer_Init(RingBuffer *rb, uint8_t *storage, uint16_t size)
 {
     rb->buf  = storage;
-    rb->size = size;
+    rb->size = (size >= 2u) ? size : 0u;
     rb->head = 0;
     rb->tail = 0;
 }
 
 bool RingBuffer_Put(RingBuffer *rb, uint8_t byte)
 {
-    uint16_t next = (uint16_t)((rb->head + 1u) % rb->size);
+    uint16_t next;
+
+    if (rb->size < 2u) {
+        return false;
+    }
+    next = (uint16_t)((rb->head + 1u) % rb->size);
 
     if (next == rb->tail) {
         return false; /* 缓冲区已满 */
@@ -23,7 +28,7 @@ bool RingBuffer_Put(RingBuffer *rb, uint8_t byte)
 
 bool RingBuffer_Get(RingBuffer *rb, uint8_t *byte)
 {
-    if (rb->head == rb->tail) {
+    if (rb->size < 2u || rb->head == rb->tail) {
         return false; /* 缓冲区已空 */
     }
 
@@ -34,6 +39,9 @@ bool RingBuffer_Get(RingBuffer *rb, uint8_t *byte)
 
 uint16_t RingBuffer_Count(const RingBuffer *rb)
 {
+    if (rb->size < 2u) {
+        return 0;
+    }
     return (uint16_t)(((uint32_t)rb->head + rb->size - rb->tail) % rb->size);
 }
 
@@ -44,6 +52,11 @@ bool RingBuffer_IsEmpty(const RingBuffer *rb)
 
 bool RingBuffer_IsFull(const RingBuffer *rb)
 {
-    uint16_t next = (uint16_t)((rb->head + 1u) % rb->size);
+    uint16_t next;
+
+    if (rb->size < 2u) {
+        return false;
+    }
+    next = (uint16_t)((rb->head + 1u) % rb->size);
     return next == rb->tail;
 }
