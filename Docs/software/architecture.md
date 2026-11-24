@@ -89,8 +89,9 @@ Config 只存放配置，不存放业务逻辑；未经确认的硬件映射不�
 ### 3.7 tests（测试层）
 
 - `tests/` 使用独立 CMake 工程与 PC GCC 构建，不引入 HAL。
-- 测试对象包括 Common、PID、麦轮运动学、底盘（假电机接口）、
-  通信协议和 scheduler 等可独立运行的模块。
+- 当前 `tests/CMakeLists.txt` 中真实存在的测试对象为：`test_ring_buffer`、
+  `test_ring_buffer_invalid_size`、`test_crc8`、`test_mecanum`、
+  `test_pid`、`test_pid_invalid_dt`、`test_scheduler`。
 - tests 不进入 MCU 正式构建。
 
 ## 4. 依赖规则
@@ -195,13 +196,31 @@ target_include_directories(实际目标名称 PRIVATE ${USER_INCLUDES})
 `cmake/project_sources.cmake` 第一版使用显式源文件清单，只登记进入 MCU
 正式构建的用户 `.c` 文件与头文件目录；tests 与 CubeMX 已登记源文件不得重复加入。
 
-## 8. 当前状态
+## 8. 当前状态与演进记录
 
-- 目录框架已按仓库最终目录结构建立。
-- `agent_rules.md` 与 `Docs/development/setup-notes.md` 已落成。
-- 尚未实现任何具体驱动、算法或状态机代码。
-- 硬件信息（引脚、外设、通信参数、CRC 参数、电机与舵机参数等）尚未确认，
-  实现对应驱动前必须先核实，未勾选项目须先询问确认。
+### 8.1 当前状态
+
+| 层次 | 状态 | 具体文件 |
+| --- | --- | --- |
+| Common | 已实现 | `Common/Inc/crc8.h`、`Common/Src/crc8.c`、`Common/Inc/ring_buffer.h`、`Common/Src/ring_buffer.c` |
+| Modules | 部分实现 | `Modules/chassis/motor_if.h`、`Modules/chassis/mecanum.h`、`Modules/chassis/mecanum.c`、`Modules/pid/pid.h`、`Modules/pid/pid.c`；`Modules/comm/` 未开始 |
+| Application | 部分实现 | `Application/scheduler/scheduler.h`、`Application/scheduler/scheduler.c`；`app.c`、`service/`、`task/` 未开始 |
+| BSP | 未开始 | `BSP/board`、`BSP/stepper`、`BSP/servo`、`BSP/uart`、`BSP/input` 均为空目录，无入库文件 |
+| Config | 未开始 | `Config/` 为空目录，无入库文件 |
+| Core | 已实现（CubeMX 生成） | `Core/Src/main.c`、`Core/Src/stm32f4xx_it.c`、`Core/Src/stm32f4xx_hal_msp.c`、`Core/Src/system_stm32f4xx.c`、`Core/Src/syscalls.c`、`Core/Src/sysmem.c` 及 `Core/Inc/` 对应头文件 |
+
+### 8.2 演进记录
+
+| 日期 | 内容 | 依据(提交号) |
+| --- | --- | --- |
+| 2026-11-23 | 168MHz 时钟/TIM6/TIM1/USART2 | 5936fbe |
+| 2026-11-22 | 麦轮解算修正 | 097d449 |
+| 2026-11-22 | 增加文件地图 | d542d42 |
+| 2026-11-22 | ring_buffer/PID 边界修正 | c7c8824 |
+| 2026-11-22 | 阶段1-7 文档/CMake/算法 | d6e82cd |
+| 2026-11-21 | 移除 led 模块 | da9d367 |
+| 2026-11-21 | 新增 led 模块 | 8c613c7 |
+| 2026-11-20 | CubeMX 基线 | b386639 |
 
 ## 9. 后续阶段
 
