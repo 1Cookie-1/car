@@ -37,3 +37,4 @@ ctest --test-dir tests/build --output-on-failure
 1. `agent_rules.md`
 2. `Docs/software/file-map.md`
 3. `Docs/software/architecture.md` 第 8 节
+4. `常用命令见 Docs/development/commands.md`
