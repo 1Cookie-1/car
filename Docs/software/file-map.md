@@ -12,7 +12,7 @@
 | Modules/chassis/mecanum.h | 麦轮运动学接口声明：`ChassisVelocity` 结构（vx/vy/wz 及单位注释），`Mecanum_Solve` 原型 | 只有声明 | 被 `Modules/chassis/mecanum.c`、`tests/modules/test_mecanum.c` 包含 |
 | Modules/chassis/mecanum.c | 四轮麦轮逆运动学解算实现 `Mecanum_Solve`：由 vx/vy/wz 和半长、半宽计算四个轮子的线速度 | 已实现 | `Mecanum_Solve` 仅被 `tests/modules/test_mecanum.c` 调用；生产代码未被引用 |
 | Modules/pid/pid.h | 位置式 PID 接口声明：`Pid` 结构（kp/ki/kd、积分限幅、输出限幅、微分先行状态），`Pid_Init`/`Pid_Update`/`Pid_Reset` 原型 | 只有声明 | 被 `Modules/pid/pid.c`、`tests/modules/test_pid.c`、`tests/modules/test_pid_invalid_dt.c` 包含 |
-| Modules/pid/pid.c | 位置式 PID 实现：积分限幅（anti-windup）、微分先行（derivative on measurement）、输出限幅；`dt <= 0` 时返回 0 且不修改状态；含静态辅助函数 `clampf` | 已实现 | `Pid_Init`/`Pid_Update`/`Pid_Reset` 仅被 `tests/modules/test_pid.c`、`tests/modules/test_pid_invalid_dt.c` 调用；生产代码未被引用 |
+| Modules/pid/pid.c | 位置式 PID 实现：积分限幅（anti-windup）、微分先行（derivative on measurement）、输出限幅；`dt <= 0` 时返回 0 且不修改状态；含静态辅助函数 `clampf` | 已实现 |`Pid_Init`/`Pid_Update` 仅被 `tests`/`modules`/`test_pid.c`、`tests`/`modules`/`test_pid_invalid_dt.c` 调用；`Pid_Reset` 无调用点，仅 `pid.h:26` 声明与 `pid.c:27` 定义；生产代码未被引用 |
 | BSP/board | 空 | 空目录 | 未被引用 |
 | BSP/input | 空 | 空目录 | 未被引用 |
 | BSP/servo | 空 | 空目录 | 未被引用 |
