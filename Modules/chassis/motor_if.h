@@ -12,6 +12,6 @@ typedef struct {
     int32_t (*get_position)(MotorId id);                     /* 可为 NULL */
 } MotorIf;
 
-extern MotorIf g_motor;   /* 由 BSP/board 的 board_init() 填充，现在不要实现 */
+extern MotorIf g_motor;   /* 由 BSP/board 的 Board_init() 填充，现在不要实现 */
 
 #endif /* MOTOR_IF_H */
