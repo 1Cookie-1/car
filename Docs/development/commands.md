@@ -33,7 +33,7 @@ arm-none-eabi-size build/Debug/car.elf
 输出三列：`text`（Flash）、`data` + `bss`（RAM）。
 当前基线：Flash 约 14.6 KB / 512 KB，RAM 约 1.8 KB / 128 KB。
 
-## 4. 跑 PC 测试（7 项）
+## 4. 跑 PC 测试（12 项）
 
 ```bash
 cmake -S tests -B tests/build       # 只在第一次跑
@@ -41,7 +41,7 @@ cmake --build tests/build
 ctest --test-dir tests/build --output-on-failure
 ```
 
-成功标志：`100% tests passed, 0 tests failed out of 7`
+成功标志：`100% tests passed, 0 tests failed out of 12`
 
 只跑其中一项（例如只看 PID）：
 
@@ -87,7 +87,7 @@ git push
 
 ```bash
 git commit -m "fix(pid): dt<=0 不再改写状态" -m "Why: 采样异常时微分项冲击。
-Verify: 已编译验证 0 error 0 warning；测试 7/7 通过。"
+Verify: 已编译验证 0 error 0 warning；测试 12/12 通过。"
 ```
 
 看历史：
@@ -117,9 +117,10 @@ git restore --staged 文件名     # 取消暂存，改动还留着
 ## 8. 提交前检查清单
 
 - [ ] 干净构建：0 error 0 warning
-- [ ] 涉及算法时：测试 7/7 通过
+- [ ] 涉及算法时：测试 12/12 通过
 - [ ] `git status` 里没有意外的文件（比如临时脚本、截图）
 - [ ] 没验证的部分，提交信息里写明「未编译验证」
+
 ## 9. 撤销与还原
 
 | 处境 | 命令 |

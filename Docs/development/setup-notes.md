@@ -301,12 +301,12 @@ Board_Init() 负责绑定接口。
 十、PC 端测试注意事项
 tests 使用独立 CMake 工程。
 测试目标：
-Common/ring_buffer（test_ring_buffer、test_ring_buffer_invalid_size）。
+Common/ring_buffer（test_ring_buffer、test_ring_buffer_invalid_size、test_ring_buffer_null）。
 Common/crc8（test_crc8）。
-Modules/chassis/mecanum（test_mecanum）。
-Modules/pid（test_pid、test_pid_invalid_dt）。
-Application/scheduler（test_scheduler，传入模拟时间，验证到期判断、溢出与任务分发）。
-以上 7 个可执行目标均已在 tests/CMakeLists.txt 中登记。
+Modules/chassis/mecanum（test_mecanum、test_mecanum_extra）。
+Modules/pid（test_pid、test_pid_invalid_dt、test_pid_invalid_inputs、test_pid_overflow）。
+Application/scheduler（test_scheduler、test_scheduler_extra，传入模拟时间，验证到期判断、溢出、运行期保护与任务分发）。
+以上 12 个可执行目标均已在 tests/CMakeLists.txt 中登记。
 规则：
 不引入 STM32 HAL。
 不依赖 STM32 外设。

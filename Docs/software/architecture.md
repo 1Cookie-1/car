@@ -91,7 +91,9 @@ Config 只存放配置，不存放业务逻辑；未经确认的硬件映射不�
 - `tests/` 使用独立 CMake 工程与 PC GCC 构建，不引入 HAL。
 - 当前 `tests/CMakeLists.txt` 中真实存在的测试对象为：`test_ring_buffer`、
   `test_ring_buffer_invalid_size`、`test_crc8`、`test_mecanum`、
-  `test_pid`、`test_pid_invalid_dt`、`test_scheduler`。
+  `test_pid`、`test_pid_invalid_dt`、`test_scheduler`、
+  `test_ring_buffer_null`、`test_pid_invalid_inputs`、`test_scheduler_extra`、
+  `test_mecanum_extra`、`test_pid_overflow`（共 12 项）。
 - tests 不进入 MCU 正式构建。
 
 ## 4. 依赖规则
@@ -182,6 +184,55 @@ scheduler 和状态机；状态机只负责事后记录与复位。
 `App_Loop()` 是单次调度入口，不自带永久循环，不得长时间阻塞。
 应用调度统一使用一个时基，优先复用 `HAL_GetTick()`。
 
+### 6.1 当前 main.c 实际状态（已实现）
+
+当前 `Core/Src/main.c` 实际执行顺序：
+
+1. `HAL_Init()`
+2. `SystemClock_Config()`
+3. `MX_GPIO_Init()`
+4. `MX_TIM6_Init()`
+5. `MX_TIM1_Init()`
+6. `MX_USART2_UART_Init()`
+7. 进入 `while (1)`（USER CODE 区为空，尚未调用 `Board_Init` / `App_Init` /
+   `App_Loop`）
+
+外设当前状态：
+
+| 外设 | 已配置 | 已启动 | 说明 |
+| --- | --- | --- | --- |
+| TIM6 | 是 | 否 | 84MHz 定时时钟 / (83+1) = 1MHz，Period=49 → 20kHz 更新；NVIC 已使能 `TIM6_DAC_IRQn`，但 main 未调用 `HAL_TIM_Base_Start_IT`，定时器未运行 |
+| TIM1 | 是 | 否 | 168MHz / (167+1) = 1MHz，Period=19999 → 50Hz PWM；CH1（PE9）Pulse=1500（约 7.5% 占空比）；未调用 `HAL_TIM_PWM_Start`，PWM 未输出 |
+| USART2 | 是 | 否 | 115200 8N1，PA2=TX、PA3=RX；NVIC 已使能 `USART2_IRQn`，但未调用 `HAL_UART_Receive_IT`，未开始接收 |
+
+「已配置」指 CubeMX 生成的初始化函数已执行（句柄与 NVIC 已设置）；
+「已启动」指调用 `HAL_TIM_Base_Start_IT` / `HAL_TIM_PWM_Start` /
+`HAL_UART_Receive_IT` 等启动接口，当前均未调用。
+
+中断与 HAL 回调关系：
+
+- `SysTick_Handler` 调用 `HAL_IncTick()`，提供 `HAL_GetTick()` 毫秒时基。
+- `USART2_IRQHandler` 调用 `HAL_UART_IRQHandler(&huart2)`，接收/发送完成时
+  会回调 `HAL_UART_RxCpltCallback` / `HAL_UART_TxCpltCallback` 等，当前未实现。
+- `TIM6_DAC_IRQHandler` 调用 `HAL_TIM_IRQHandler(&htim6)`，更新事件会回调
+  `HAL_TIM_PeriodElapsedCallback`，当前未实现。
+
+### 6.2 应用层接入方案（设计，未实现）
+
+以下为未来接入方案，不属于当前已实现代码。待 `BSP/board`、`Application/app.c`
+等文件落地后，再按 `agent_rules.md` 第 11 节接入 main.c 的 USER CODE 区：
+
+1. `HAL_Init()` → `SystemClock_Config()` → CubeMX 外设初始化（现状不变）。
+2. 在 `USER CODE BEGIN 2` 区依次调用 `Board_Init();` 与 `App_Init();`：
+   `Board_Init()` 初始化 BSP 驱动并绑定 `g_motor` 等抽象接口；
+   `App_Init()` 初始化 scheduler、comm_service、chassis、task 等应用模块。
+3. 在 `USER CODE BEGIN WHILE` 区的 `while (1)` 内调用 `App_Loop();`。
+4. `App_Loop()` 每次执行一次调度（例如 `Sched_Run(HAL_GetTick())`），
+   不自带永久循环、不长时间阻塞。
+
+在上述接入完成前，main.c 保持现状：不启动未确认用途的 PWM 或定时器中断，
+不编造 UART 接收协议。
+
 ## 7. 构建接入方式
 
 根 `CMakeLists.txt` 保留 CubeMX 原有结构。在确认 `add_executable()`
@@ -221,6 +272,9 @@ target_include_directories(实际目标名称 PRIVATE ${USER_INCLUDES})
 | 2026-11-21 | 移除 led 模块 | da9d367 |
 | 2026-11-21 | 新增 led 模块 | 8c613c7 |
 | 2026-11-20 | CubeMX 基线 | b386639 |
+
+注：上表只记录已提交的历史。本阶段（第一/第二轮整改）尚未提交，
+未计入上表，也不编造提交号或构建结果。
 
 ## 9. 后续阶段
 

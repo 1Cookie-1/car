@@ -12,11 +12,19 @@
  *   - 同一时刻最多一个消费者调用 RingBuffer_Get。
  * 本实现不提供锁或临界区保护，不适用于多生产者或多消费者并发场景。
  *
+ * 关于 volatile：
+ *   - head / tail 声明为 volatile 仅用于提示编译器这两个字段可能被
+ *     中断服务程序修改，避免把读写结果长期缓存到寄存器而不重新加载；
+ *   - volatile 不提供任何原子性、内存屏障或线程/中断安全保证，不能
+ *     替代临界区、锁或无锁算法，更不能被当作多线程安全的依据。
+ *
  * 约定：
  *   - head == tail 表示缓冲区为空；
  *   - 始终保留一个空位用于区分空/满，有效容量 = size - 1，最小 size 为 2；
  *   - size 不要求是 2 的幂；size < 2 时初始化为无效缓冲区；
- *   - 无效缓冲区 Put/Get 返回 false，Count 返回 0，IsEmpty 为 true，IsFull 为 false；
+ *   - 无效缓冲区（rb 为 NULL、存储区为 NULL 或 size < 2）：
+ *     Put/Get 返回 false，Count 返回 0，IsEmpty 为 true，IsFull 为 false；
+ *   - RingBuffer_Get 的输出指针为 NULL 时返回 false，且不消费数据；
  *   - 不使用动态内存，存储空间由调用者提供。
  */
 typedef struct {
