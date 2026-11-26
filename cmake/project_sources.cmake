@@ -27,3 +27,9 @@ set(USER_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/Application/scheduler
     ${CMAKE_CURRENT_SOURCE_DIR}/Application/task
 )
+
+add_custom_command(TARGET car POST_BUILD
+    COMMAND "${CMAKE_OBJCOPY}" -O ihex "$<TARGET_FILE:car>" "$<TARGET_FILE_DIR:car>/car.hex"
+    COMMAND "${CMAKE_OBJCOPY}" -O binary "$<TARGET_FILE:car>" "$<TARGET_FILE_DIR:car>/car.bin"
+    VERBATIM
+)
